@@ -1,18 +1,31 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
 const readlineSync = require("readline-sync");
+const axios = require("axios");
 const _ = require("lodash");
 
-// Function to load JSON files
-function loadJsonFile(filePath) {
+// Function to fetch JSON data from a URL
+async function fetchJsonData(url) {
   try {
-    const data = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error(`Error reading file from disk: ${err}`);
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching data from ${url}: ${error}`);
     process.exit(1);
   }
+}
+
+// Function to load riddles and answers data from GitHub
+async function loadGameData() {
+  const riddlesUrl =
+    "https://raw.githubusercontent.com/justuche224/flix-riddles/main/riddles/riddles.json";
+  const answersUrl =
+    "https://raw.githubusercontent.com/justuche224/flix-riddles/main/riddles/answers.json";
+
+  const riddles = await fetchJsonData(riddlesUrl);
+  const answers = await fetchJsonData(answersUrl);
+
+  return { riddles, answers };
 }
 
 // Function to check answer using regex (case insensitive)
@@ -21,19 +34,18 @@ function checkAnswer(userAnswer, correctAnswer) {
   return regex.test(userAnswer);
 }
 
-// Load riddles and answers
-const riddles = loadJsonFile("./riddles/riddles.json");
-const answers = loadJsonFile("./riddles/answers.json");
-
-// Shuffle riddles
-const shuffledRiddleIds = _.shuffle(Object.keys(riddles));
-
 // Game variables
 let score = 0;
 let answered = 0;
 
 // Dynamically import chalk
 async function importChalk() {
+  // Load riddles and answers
+  const { riddles, answers } = await loadGameData();
+
+  // Shuffle riddles
+  const shuffledRiddleIds = _.shuffle(Object.keys(riddles));
+
   const { default: chalk } = await import("chalk");
 
   // Display welcome message

@@ -1,6 +1,6 @@
 {
   "name": "flix-riddles",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A CLI riddle game",
   "main": "index.js",
   "bin": {
@@ -21,6 +21,7 @@
     "url": "git+https://github.com/justuche224/flix-riddles.git"
   },
   "dependencies": {
+    "axios": "^1.7.2",
     "chalk": "^5.3.0",
     "lodash": "^4.17.21",
     "readline-sync": "^1.4.10"
